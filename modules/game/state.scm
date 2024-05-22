@@ -46,9 +46,8 @@
     (set-particle-accel ball (vec2 0.0 480.0))
     (set-particle-damping ball 0.99)
     (set-particle-inverse-mass ball 100)
-    ball
-    )
-  )
+    (set-particle-active ball #t)
+    ball))
 
 (define (init-club)
   (let ((club (make-particle) ))
@@ -59,6 +58,7 @@
     (set-particle-accel club (vec2 0.0 480.0))
     (set-particle-damping club 0.99)
     (set-particle-inverse-mass club 100)
+    (set-particle-active club #t)
     club))
 
 (define (init-state state)

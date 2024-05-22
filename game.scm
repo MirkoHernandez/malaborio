@@ -66,10 +66,9 @@
   (when (< active-props 5)
     (set! active-props (+ active-props 1))
     (let ((ball (hashtable-ref props active-props)))
-      ;; Reduce current velocity (Simulate a hand grab)
+      ;; Reduce current velocity (Simulate a hand grabbing the prop)
       ;; (set-vec2-y!
        ;; (particle-vel ball) 0)
-      (pk "vel" (vec2-y (particle-vel ball)))
       (set-vec2-x!
        (particle-pos ball)
        (- (vec2-x player-pos)
@@ -112,16 +111,19 @@
   (let loop ((max active-props)
 	     (i 1))
     (when (<= i active-props)
-     (integrate-particle (hashtable-ref props i) dt) 
+      (let ((prop  (hashtable-ref props i))
+	    (floor-pos (+ (vec2-y (player-pos *state*)) 160)))
+
+	(when (particle-active prop)
+	  (integrate-particle  prop dt)
+	  ;; collision
+	  (when (> (vec2-y (particle-pos prop))
+		   floor-pos)
+	    (set-vec2-y! (particle-pos prop) floor-pos)
+	    (set-vec2-y! (particle-vel prop) 0)
+	    (set-vec2-x! (particle-vel prop) 0)
+	    (set-particle-active prop #f))))
       (loop max (+ i 1))))
-  
-  ;; collision
-  ;; (when (> (vec2-y (particle-pos (ball *state*)))
-  ;; (+ 160 (vec2-y (player-pos *state*))))
-  ;; (set-vec2-y! (particle-pos (ball *state*))
-  ;; (+ 160 (vec2-y (player-pos *state*))))
-  ;; (set-vec2-y! (particle-vel (ball *state*)) 0)
-  ;; (set-vec2-x! (particle-vel (ball *state*)) 0))
   
   (when (< (vec2-x (player-pos  *state*)) 0)
     (set-vec2-x! (player-pos  *state*) 0))

@@ -16,6 +16,8 @@
 	    particle-vel
 	    particle-accel
 	    particle-force
+	    particle-active
+	    set-particle-active
 	    set-particle-inverse-mass
 	    set-particle-accel 
 	    set-particle-vel 
@@ -32,7 +34,10 @@
   (particle-force particle-force set-particle-force)
   (particle-pos particle-pos set-particle-pos)
   (particle-vel particle-vel set-particle-vel)
-  (particle-accel particle-accel set-particle-accel))
+  (particle-accel particle-accel set-particle-accel)
+  ;; NOTE: this should be a separate property of another object (prop)
+  ;; but I did not manage to use the #:parent property.
+  (particle-active particle-active set-particle-active))
 
 (define (integrate-particle particle dt)
   (let ((dt (inexact (/ dt  1000)) ))
