@@ -63,7 +63,7 @@
 	   (request-full-screen canvas)))))
 
 (define (launch-ball player-pos)
-  (when (< active-props 5)
+  (when (< active-props max-active-props)
     (set! active-props (+ active-props 1))
     (let ((ball (hashtable-ref props active-props)))
       ;; Reduce current velocity (Simulate a hand grabbing the prop)
@@ -80,12 +80,6 @@
       (set-vec2-y! (particle-force ball) -280)
       (set-vec2-x! (particle-force ball) 15))))
 
-(define (increase-gravity ball)
- (pk "vel" (vec2-y (particle-accel ball))) 
- (set-vec2-y!
-  (particle-accel ball)
-  (+ (vec2-y (particle-accel ball)) 30)))
-
 (define (update)
   ;; input
   (cond 
@@ -93,8 +87,7 @@
     (launch-ball (player-pos *state*))
     )
    ((button-was-down (input-one *game-input*))
-    ;; (increase-gravity (ball *state*))
-    (pk "increase")
+    (pk "placeholder")
     )
    ((button-was-down (input-fullscreen *game-input*))
     (toggle-fullscreen))
@@ -143,6 +136,9 @@
 ;;;; Rendering
 (define context (get-context canvas "2d"))
 
+(define image:ball (make-image "assets/images/ball.png"))
+(define image:club (make-image "assets/images/club.png"))
+
 (define game-width    640.0)
 (define game-height   480.0)
 
@@ -151,10 +147,15 @@
 
 (define draw-rectangle (create-draw-rectangle context))
 (define draw-sprite (create-draw-sprite context))
-(define draw-juggler (create-draw-juggler draw-rectangle))
-(define draw-chair (create-draw-chair draw-rectangle))
 
-(define props (init-props 5))
+(define draw-chair (create-draw-chair draw-rectangle))
+(define draw-chair-row (create-draw-chair-row draw-chair))
+
+(define draw-line (create-draw-line context))
+(define draw-juggler (create-draw-juggler draw-rectangle draw-line))
+
+(define max-active-props 10)
+(define props (init-props max-active-props))
 
 (define active-props 0)
 
@@ -167,11 +168,12 @@
   (let loop ((max active-props)
 	     (i 1))
     (when (<= i active-props)
-      (when (not (particle-active (hashtable-ref props i))) 
-	(draw-rectangle "#2222FF"
-			(particle-pos
-			 (hashtable-ref props i))
-			(vec2 10.0 10.0)))
+      (when (not (particle-active (hashtable-ref props i)))
+
+	(draw-sprite image:ball
+		     (particle-pos
+		      (hashtable-ref props i))
+		     (vec2 16.0 16.0)))
       (loop max (+ i 1))))
   
   (draw-juggler (player-pos *state*))
@@ -179,19 +181,17 @@
   (let loop ((max active-props)
 	     (i 1))
     (when (<= i active-props)
-      (when (particle-active (hashtable-ref props i)) 
-	(draw-rectangle "#2222FF"
-			(particle-pos
-			 (hashtable-ref props i))
-			(vec2 10.0 10.0)))
+      (when (particle-active (hashtable-ref props i))
+
+	(draw-sprite image:ball
+		     (particle-pos
+		      (hashtable-ref props i))
+		     (vec2 16.0 16.0)))
       (loop max (+ i 1))))
+
   
-  (draw-chair (vec2 0.0 420.0)
-	      (vec2 70.0 60.0))
-  (draw-chair (vec2 75.0 420.0)
-	      (vec2 70.0 60.0))
-  (draw-chair (vec2 150.0 420.0)
-	      (vec2 70.0 60.0))
+  (draw-chair-row (vec2 20.0 380) (vec2 70.0 60.0) game-width 15.0)
+  (draw-chair-row (vec2 0.0 420) (vec2 70.0 60.0) game-width 15.0)
   
   (request-animation-frame draw-callback))
 
