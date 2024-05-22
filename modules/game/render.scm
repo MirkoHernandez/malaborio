@@ -36,6 +36,15 @@
       (draw-rectangle "#FFFF22" pos arm-size)
       (draw-rectangle "#FF22aa" forearm-pos forearm-size)))
 
+  (define (draw-props pos)
+    (let ((prop1 (vec2-add pos (vec2 2.0 70.0)))
+	  (prop2 (vec2-add pos (vec2 4.0 65.0)))
+	  (prop3 (vec2-add pos (vec2 8.0 70.0)))
+	  (size (vec2 10.0 10.0)))
+      (draw-rectangle "#2222ff" prop1 size)
+      (draw-rectangle "#2222ff" prop2 size)
+      (draw-rectangle "rgb(255 0 0)" prop3 size)))
+  
   (define (draw-leg pos)
     (let ((leg-size (vec2 16.0 30.0))
 	  (calf-pos (vec2-add pos (vec2 2.0 30.0)))
@@ -56,10 +65,12 @@
 	   ;; hip
 	   (hip-pos (vec2-add pos (vec2 -10.0 60.0)))
 	   (hip-size (vec2 40 20))
-	   ;; arms
+	   
+	   ;; NOTE: left and right in relation to the screen.
+	   
+	   ;; arms 
 	   (left-arm-pos (vec2-add pos (vec2 -22.0 20.0)))
 	   (right-arm-pos (vec2-add pos (vec2 32.0 20.0)))
-
 	   ;; legs
 	   (left-leg-pos (vec2-add pos (vec2 -8.0 80.0)))
 	   (right-leg-pos (vec2-add pos (vec2 12.0 80.0))))
@@ -72,6 +83,8 @@
       ;; arms
       (draw-arm left-arm-pos)
       (draw-arm right-arm-pos)
+      ;; props
+      (draw-props left-arm-pos)
       ;; legs
       (draw-leg left-leg-pos)
       (draw-leg right-leg-pos)))

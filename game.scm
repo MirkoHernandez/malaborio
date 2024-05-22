@@ -19,7 +19,6 @@
 ;;; Code:
 (import (scheme base)
         (scheme inexact)
-        (scheme lazy)
         (hoot ffi)
         (hoot hashtables)
         (hoot match)
@@ -63,11 +62,24 @@
 	 (when (external-null? (full-screen-element document))
 	   (request-full-screen canvas)))))
 
-(define (launch-ball ball)
-  ;; Reduce current velocity (Simulate a hand grab)
-  (set-vec2-y!
-   (particle-vel ball) 0)
-  (set-vec2-y! (particle-force ball) -280))
+(define (launch-ball player-pos)
+  (when (< active-props 5)
+    (set! active-props (+ active-props 1))
+    (let ((ball (hashtable-ref props active-props)))
+      ;; Reduce current velocity (Simulate a hand grab)
+      ;; (set-vec2-y!
+       ;; (particle-vel ball) 0)
+      (pk "vel" (vec2-y (particle-vel ball)))
+      (set-vec2-x!
+       (particle-pos ball)
+       (- (vec2-x player-pos)
+	  20))
+      (set-vec2-y!
+       (particle-pos ball)
+       (+ (vec2-y player-pos)
+	  90))
+      (set-vec2-y! (particle-force ball) -280)
+      (set-vec2-x! (particle-force ball) 15))))
 
 (define (increase-gravity ball)
  (pk "vel" (vec2-y (particle-accel ball))) 
@@ -77,27 +89,39 @@
 
 (define (update)
   ;; input
-  (cond ((button-was-down-repeat (input-left *game-input*))
-	 (vec2-add! (player-pos *state*) (vec2 -5.0 0.0)))
-	((button-was-down (input-action *game-input*))
-	 (launch-ball (ball *state*)))
-	((button-was-down (input-one *game-input*))
-	 (increase-gravity (ball *state*)))
-	((button-was-down (input-fullscreen *game-input*))
-	 (toggle-fullscreen))
-	((button-was-down-repeat (input-right *game-input*))
-	 (vec2-add! (player-pos *state*) (vec2 5.0 0.0)))
-	((button-was-down (input-down *game-input*))
-	 (vec2-add! (player-pos *state*) (vec2 0.0 5.0)))
-	((button-was-down (input-up *game-input*))
-	 (vec2-add! (player-pos *state*) (vec2 0.0 -5.0))))
-  (integrate-particle (ball *state*) dt)
+  (cond 
+   ((button-was-down (input-action *game-input*))
+    (launch-ball (player-pos *state*))
+    )
+   ((button-was-down (input-one *game-input*))
+    ;; (increase-gravity (ball *state*))
+    (pk "increase")
+    )
+   ((button-was-down (input-fullscreen *game-input*))
+    (toggle-fullscreen))
+   ;; player movement
+   ((button-was-down-repeat (input-left *game-input*))
+    (vec2-add! (player-pos *state*) (vec2 -5.0 0.0)))
+   ((button-was-down-repeat (input-right *game-input*))
+    (vec2-add! (player-pos *state*) (vec2 5.0 0.0)))
+   ((button-was-down-repeat (input-down *game-input*))
+    (vec2-add! (player-pos *state*) (vec2 0.0 5.0)))
+   ((button-was-down-repeat (input-up *game-input*))
+    (vec2-add! (player-pos *state*) (vec2 0.0 -5.0))))
+
+  (let loop ((max active-props)
+	     (i 1))
+    (when (<= i active-props)
+     (integrate-particle (hashtable-ref props i) dt) 
+      (loop max (+ i 1))))
   
   ;; collision
-  (when (> (vec2-y (particle-pos (ball *state*))) 350)
-    (set-vec2-y! (particle-vel (ball *state*)) 0)
-    (set-vec2-x! (particle-vel (ball *state*)) 0)
-    (set-vec2-y! (particle-pos (ball *state*)) 350))
+  ;; (when (> (vec2-y (particle-pos (ball *state*)))
+  ;; (+ 160 (vec2-y (player-pos *state*))))
+  ;; (set-vec2-y! (particle-pos (ball *state*))
+  ;; (+ 160 (vec2-y (player-pos *state*))))
+  ;; (set-vec2-y! (particle-vel (ball *state*)) 0)
+  ;; (set-vec2-x! (particle-vel (ball *state*)) 0))
   
   (when (< (vec2-x (player-pos  *state*)) 0)
     (set-vec2-x! (player-pos  *state*) 0))
@@ -123,17 +147,26 @@
 (define draw-sprite (create-draw-sprite context))
 (define draw-juggler (create-draw-juggler draw-rectangle))
 
+(define props (init-props 5))
+
+(define active-props 0)
+
 (define (draw prev-time)
   (set-fill-color! context "#140c1c")
   (fill-rect context 0.0 0.0 game-width game-height)
   (draw-rectangle "#ff8822" (vec2 0.0 250.0)
 		  (vec2 640.0 200.0))
-
   (draw-juggler (player-pos *state*))
-  
-  (draw-rectangle "#2222FF"
-		 (particle-pos (ball *state*)) 
-		  (vec2 10.0 10.0))
+
+  (let loop ((max active-props)
+	     (i 1))
+    (when (<= i active-props)
+      
+      (draw-rectangle "#2222FF"
+		      (particle-pos  
+		       (hashtable-ref props i))
+		      (vec2 10.0 10.0))
+      (loop max (+ i 1))))
   
   (request-animation-frame draw-callback))
 
