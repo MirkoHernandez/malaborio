@@ -119,10 +119,14 @@
 	  ;; collision
 	  (when (> (vec2-y (particle-pos prop))
 		   floor-pos)
-	    (set-vec2-y! (particle-pos prop) floor-pos)
-	    (set-vec2-y! (particle-vel prop) 0)
-	    (set-vec2-x! (particle-vel prop) 0)
-	    (set-particle-active prop #f))))
+	    (if (not (equal? (particle-active prop) 'rebound))
+		(begin	
+		  (set-vec2-y! (particle-pos prop) floor-pos)
+		  (set-vec2-y! (particle-vel prop) -30)
+		  (set-vec2-x! (particle-vel prop) 6)
+		  (set-particle-active prop 'rebound))
+		(set-particle-active prop #f)
+		))))
       (loop max (+ i 1))))
   
   (when (< (vec2-x (player-pos  *state*)) 0)
@@ -182,9 +186,11 @@
 			(vec2 10.0 10.0)))
       (loop max (+ i 1))))
   
-  (draw-chair (vec2 5.0 420.0)
+  (draw-chair (vec2 0.0 420.0)
 	      (vec2 70.0 60.0))
   (draw-chair (vec2 75.0 420.0)
+	      (vec2 70.0 60.0))
+  (draw-chair (vec2 150.0 420.0)
 	      (vec2 70.0 60.0))
   
   (request-animation-frame draw-callback))
