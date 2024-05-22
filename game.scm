@@ -162,9 +162,20 @@
 (define (draw prev-time)
   (set-fill-color! context "#140c1c")
   (fill-rect context 0.0 0.0 game-width game-height)
-  (draw-rectangle "#ff8822" (vec2 0.0 250.0)
-		  (vec2 640.0 200.0))
 
+  ;; stage
+  (draw-rectangle "#dddddd" (vec2 0.0 0.0)
+		  (vec2 640.0 150.0))
+  ;; floor
+  (draw-rectangle "#4a281b" (vec2 0.0 150.0)
+		  (vec2 640.0 10.0))
+  
+  (draw-rectangle "#ff8822" (vec2 0.0 160.0)
+		  (vec2 640.0 120.0))
+  
+  (draw-rectangle "#4a281b" (vec2 0.0 280.0)
+		  (vec2 640.0 10.0))
+  
   (let loop ((max active-props)
 	     (i 1))
     (when (<= i active-props)
