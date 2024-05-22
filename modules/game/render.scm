@@ -7,6 +7,7 @@
   #:use-module (math vector)
   #:export (create-draw-rectangle
 	    create-draw-sprite
+	    create-draw-chair
 	    create-draw-juggler))
 
 (define (create-draw-rectangle context)
@@ -27,6 +28,9 @@
 		(vec2-y pos)
 		(vec2-x size)
 		(vec2-y size))))
+
+
+
 
 (define (create-draw-juggler draw-rectangle)
   (define (draw-arm pos)
@@ -91,5 +95,11 @@
   (lambda (pos)
     (draw-juggler pos)))
 
-
+(define (create-draw-chair draw-rectangle)
+  (lambda (pos size)
+    (draw-rectangle  "#083e46" pos size)
+    (draw-rectangle "#6b471D"
+		    (vec2-add pos (vec2 5.0 5.0))
+		    (vec2-add size
+			      (vec2 -10.0 -10.0)))))
 
