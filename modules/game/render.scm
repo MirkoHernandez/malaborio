@@ -9,6 +9,7 @@
   #:export (create-draw-rectangle
 	    create-draw-sprite
 	    create-draw-chair
+	    create-draw-chair-row
 	    create-draw-juggler
 	    create-draw-line))
 
@@ -114,3 +115,12 @@
     (line-cap context cap)
     (stroke context)))
 
+(define (create-draw-chair-row draw-chair)
+  (lambda (start-pos size width gap)
+    (let loop ((start start-pos))
+      (when (< (vec2-x start)
+	       width)
+	(draw-chair start size)
+	(loop (vec2-add start
+			(vec2 (+ (vec2-x size) gap)
+			      0.0 )))))))
