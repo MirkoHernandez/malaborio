@@ -28,7 +28,7 @@
 (define-record-type <particle>
   (make-particle)
   particle?
-  ;; inverse-mass - less, harder to move;0 unmovable object.
+  ;; inverse-mass - less, harder to move; 0 unmovable object.
   (particle-inverse-mass particle-inverse-mass set-particle-inverse-mass)
   (particle-damping particle-damping set-particle-damping)
   (particle-force particle-force set-particle-force)

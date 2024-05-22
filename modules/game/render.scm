@@ -4,6 +4,7 @@
   #:use-module (scheme inexact)
   #:use-module (dom event)
   #:use-module (dom canvas)
+  #:use-module (dom image)
   #:use-module (math vector)
   #:export (create-draw-rectangle
 	    create-draw-sprite
@@ -30,14 +31,16 @@
 		(vec2-x size)
 		(vec2-y size))))
 
-(define (create-draw-juggler draw-rectangle)
+(define (create-draw-juggler draw-rectangle draw-line)
   (define (draw-arm pos)
     (let ((arm-size (vec2 10.0 40.0))
-	  (forearm-pos (vec2-add pos (vec2 0.0 40.0)))
-	  (forearm-size (vec2 10.0 40.0)))
+	  (forearm-pos (vec2-add pos (vec2 5.0 40.0)))
+	  (forearm-size (vec2 0.0 40.0)))
       (draw-rectangle "#FFFF22" pos arm-size)
-      (draw-rectangle "#FF22aa" forearm-pos forearm-size)))
-
+      ;; (draw-rectangle "#FF22aa" forearm-pos forearm-size)
+      (draw-line  forearm-pos  (vec2-add  forearm-pos forearm-size)
+		  "#FF22aa" 10.0 "round")))
+  
   (define (draw-props pos)
     (let ((prop1 (vec2-add pos (vec2 2.0 70.0)))
 	  (prop2 (vec2-add pos (vec2 4.0 65.0)))
@@ -102,11 +105,12 @@
 			      (vec2 -10.0 -10.0)))))
 
 (define (create-draw-line context)
-  (lambda (v1 v2 color width)
+  (lambda (v1 v2 color width cap)
     (set-fill-color! context color)
     (begin-path context)
     (move-to context (vec2-x v1) (vec2-y v1))
     (line-to context (vec2-x v2) (vec2-y v2))
     (line-width context width)
+    (line-cap context cap)
     (stroke context)))
 

@@ -37,6 +37,7 @@
 	    move-to
 	    line-to
 	    line-width
+	    line-cap
 	    stroke
 	    ))
 
@@ -93,6 +94,10 @@
 (define-foreign line-width
   "canvas" "lineWidth"
   (ref extern)  f64 -> none)
+
+(define-foreign line-cap
+  "canvas" "lineCap"
+  (ref extern)  (ref string) -> none)
 
 (define-foreign stroke
   "canvas" "stroke"

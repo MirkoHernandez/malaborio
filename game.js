@@ -62,6 +62,7 @@ window.addEventListener("load", async () => {
         moveTo: (ctx, x,y) => ctx.moveTo(x,y),
         lineTo: (ctx, x,y) => ctx.lineTo(x,y),
         lineWidth: (ctx, w) => ctx.lineWidth = w,
+        lineCap: (ctx, w) => ctx.lineCap = w,
         setFont: (ctx, font) => ctx.font = font,
         setTextAlign: (ctx, align) => ctx.textAlign = align,
         clearRect: (ctx, x, y, w, h) => ctx.clearRect(x, y, w, h),
