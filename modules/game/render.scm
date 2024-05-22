@@ -8,7 +8,8 @@
   #:export (create-draw-rectangle
 	    create-draw-sprite
 	    create-draw-chair
-	    create-draw-juggler))
+	    create-draw-juggler
+	    create-draw-line))
 
 (define (create-draw-rectangle context)
   (lambda (color pos size)
@@ -28,9 +29,6 @@
 		(vec2-y pos)
 		(vec2-x size)
 		(vec2-y size))))
-
-
-
 
 (define (create-draw-juggler draw-rectangle)
   (define (draw-arm pos)
@@ -97,9 +95,18 @@
 
 (define (create-draw-chair draw-rectangle)
   (lambda (pos size)
-    (draw-rectangle  "#083e46" pos size)
+    (draw-rectangle "#083e46" pos size)
     (draw-rectangle "#6b471D"
 		    (vec2-add pos (vec2 5.0 5.0))
 		    (vec2-add size
 			      (vec2 -10.0 -10.0)))))
+
+(define (create-draw-line context)
+  (lambda (v1 v2 color width)
+    (set-fill-color! context color)
+    (begin-path context)
+    (move-to context (vec2-x v1) (vec2-y v1))
+    (line-to context (vec2-x v2) (vec2-y v2))
+    (line-width context width)
+    (stroke context)))
 

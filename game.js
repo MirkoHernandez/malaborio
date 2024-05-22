@@ -57,6 +57,11 @@ window.addEventListener("load", async () => {
       canvas: {
         getContext: (elem, type) => elem.getContext(type),
         setFillColor: (ctx, color) => ctx.fillStyle = color,
+        beginPath: (ctx) => ctx.beginPath(),
+        stroke: (ctx) => ctx.stroke(),
+        moveTo: (ctx, x,y) => ctx.moveTo(x,y),
+        lineTo: (ctx, x,y) => ctx.lineTo(x,y),
+        lineWidth: (ctx, w) => ctx.lineWidth = w,
         setFont: (ctx, font) => ctx.font = font,
         setTextAlign: (ctx, align) => ctx.textAlign = align,
         clearRect: (ctx, x, y, w, h) => ctx.clearRect(x, y, w, h),

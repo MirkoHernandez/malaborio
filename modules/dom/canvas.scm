@@ -32,7 +32,13 @@
             draw-image
             set-scale!
             set-transform!
-            set-image-smoothing-enabled!))
+            set-image-smoothing-enabled!
+	    begin-path
+	    move-to
+	    line-to
+	    line-width
+	    stroke
+	    ))
 
 ;; HTMLCanvasElement
 (define-foreign get-context
@@ -70,3 +76,24 @@
 (define-foreign set-image-smoothing-enabled!
   "canvas" "setImageSmoothingEnabled"
   (ref extern) i32 -> none)
+
+;; draw lines
+(define-foreign begin-path
+  "canvas" "beginPath"
+  (ref extern)  -> none)
+
+(define-foreign move-to
+  "canvas" "moveTo"
+  (ref extern) f64 f64 -> none)
+
+(define-foreign line-to
+  "canvas" "lineTo"
+  (ref extern) f64 f64 -> none)
+
+(define-foreign line-width
+  "canvas" "lineWidth"
+  (ref extern)  f64 -> none)
+
+(define-foreign stroke
+  "canvas" "stroke"
+  (ref extern)  -> none)
