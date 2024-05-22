@@ -148,6 +148,7 @@
 (define draw-rectangle (create-draw-rectangle context))
 (define draw-sprite (create-draw-sprite context))
 (define draw-juggler (create-draw-juggler draw-rectangle))
+(define draw-chair (create-draw-chair draw-rectangle))
 
 (define props (init-props 5))
 
@@ -158,17 +159,33 @@
   (fill-rect context 0.0 0.0 game-width game-height)
   (draw-rectangle "#ff8822" (vec2 0.0 250.0)
 		  (vec2 640.0 200.0))
-  (draw-juggler (player-pos *state*))
 
   (let loop ((max active-props)
 	     (i 1))
     (when (<= i active-props)
-      
-      (draw-rectangle "#2222FF"
-		      (particle-pos  
-		       (hashtable-ref props i))
-		      (vec2 10.0 10.0))
+      (when (not (particle-active (hashtable-ref props i))) 
+	(draw-rectangle "#2222FF"
+			(particle-pos
+			 (hashtable-ref props i))
+			(vec2 10.0 10.0)))
       (loop max (+ i 1))))
+  
+  (draw-juggler (player-pos *state*))
+  
+  (let loop ((max active-props)
+	     (i 1))
+    (when (<= i active-props)
+      (when (particle-active (hashtable-ref props i)) 
+	(draw-rectangle "#2222FF"
+			(particle-pos
+			 (hashtable-ref props i))
+			(vec2 10.0 10.0)))
+      (loop max (+ i 1))))
+  
+  (draw-chair (vec2 5.0 420.0)
+	      (vec2 70.0 60.0))
+  (draw-chair (vec2 75.0 420.0)
+	      (vec2 70.0 60.0))
   
   (request-animation-frame draw-callback))
 
