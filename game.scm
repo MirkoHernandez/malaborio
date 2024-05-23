@@ -118,15 +118,12 @@
 		  (set-vec2-y! (particle-vel prop) -30)
 		  (set-vec2-x! (particle-vel prop) 6)
 		  (set-particle-active prop 'rebound))
-		(set-particle-active prop #f)
-		))))
+		(set-particle-active prop #f)))))
       (loop max (+ i 1))))
-  
-  (when (< (vec2-x (player-pos  *state*)) 0)
-    (set-vec2-x! (player-pos  *state*) 0))
-  
-  (when (> (vec2-x (player-pos  *state*)) game-width)
-    (set-vec2-x! (player-pos  *state*) game-width))
+
+  ;; player collision
+  (vec2-clamp! (player-pos *state*)
+	       24.0 2.0 (- game-width 40) 125.0)
   
   (clear-buttons *game-input*)
   (timeout update-callback dt))
@@ -180,7 +177,6 @@
 	     (i 1))
     (when (<= i active-props)
       (when (not (particle-active (hashtable-ref props i)))
-
 	(draw-sprite image:ball
 		     (particle-pos
 		      (hashtable-ref props i))
@@ -199,7 +195,6 @@
 		      (hashtable-ref props i))
 		     (vec2 16.0 16.0)))
       (loop max (+ i 1))))
-
   
   (draw-chair-row (vec2 20.0 380) (vec2 70.0 60.0) game-width 15.0)
   (draw-chair-row (vec2 0.0 420) (vec2 70.0 60.0) game-width 15.0)
