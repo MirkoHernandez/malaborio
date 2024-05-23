@@ -59,6 +59,7 @@ window.addEventListener("load", async () => {
         setFillColor: (ctx, color) => ctx.fillStyle = color,
         beginPath: (ctx) => ctx.beginPath(),
         stroke: (ctx) => ctx.stroke(),
+        strokeStyle: (ctx,color) => ctx.strokeStyle = color,
         moveTo: (ctx, x,y) => ctx.moveTo(x,y),
         lineTo: (ctx, x,y) => ctx.lineTo(x,y),
         lineWidth: (ctx, w) => ctx.lineWidth = w,

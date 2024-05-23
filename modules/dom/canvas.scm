@@ -39,6 +39,7 @@
 	    line-width
 	    line-cap
 	    stroke
+	    stroke-style
 	    ))
 
 ;; HTMLCanvasElement
@@ -94,6 +95,11 @@
 (define-foreign line-width
   "canvas" "lineWidth"
   (ref extern)  f64 -> none)
+
+
+(define-foreign stroke-style
+  "canvas" "strokeStyle"
+  (ref extern)  (ref string) -> none)
 
 (define-foreign line-cap
   "canvas" "lineCap"

@@ -107,12 +107,12 @@
 
 (define (create-draw-line context)
   (lambda (v1 v2 color width cap)
-    (set-fill-color! context color)
     (begin-path context)
     (move-to context (vec2-x v1) (vec2-y v1))
     (line-to context (vec2-x v2) (vec2-y v2))
     (line-width context width)
     (line-cap context cap)
+    (stroke-style context color)
     (stroke context)))
 
 (define (create-draw-chair-row draw-chair)
