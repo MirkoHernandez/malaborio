@@ -33,18 +33,17 @@
 
 (define (create-draw-rotated-sprite context)
   (lambda (image pos size rotation)
-    
     (save context)
-    
     (translate context
-	       (vec2-x pos)
+	       (vec2-x pos) 
 	       (vec2-y pos))
     (rotate context rotation)
     (draw-image context image
 		0.0
 		0.0
 		(vec2-x size) (vec2-y size)
-		0.0 0.0
+		(- (/ (vec2-x size) 2))
+		(- (/ (vec2-y size) 2))
 		(vec2-x size) (vec2-y size))
     (restore context)))
 
