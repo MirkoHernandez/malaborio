@@ -8,9 +8,11 @@
   #:use-module (math vector)
   #:export (create-draw-rectangle
 	    create-draw-sprite
+	    create-draw-rotated-sprite
 	    create-draw-chair
 	    create-draw-chair-row
 	    create-draw-juggler
+	    create-draw-arm
 	    create-draw-line))
 
 (define (create-draw-rectangle context)
@@ -25,32 +27,28 @@
     (draw-image context image
 		0.0
 		0.0
-		(vec2-x size)
-		(vec2-y size)
-		(vec2-x pos)
-		(vec2-y pos)
-		(vec2-x size)
-		(vec2-y size))))
+		(vec2-x size) (vec2-y size)
+		(vec2-x pos)  (vec2-y pos)
+		(vec2-x size) (vec2-y size))))
+
+(define (create-draw-rotated-sprite context)
+  (lambda (image pos size rotation)
+    
+    (save context)
+    
+    (translate context
+	       (vec2-x pos)
+	       (vec2-y pos))
+    (rotate context rotation)
+    (draw-image context image
+		0.0
+		0.0
+		(vec2-x size) (vec2-y size)
+		0.0 0.0
+		(vec2-x size) (vec2-y size))
+    (restore context)))
 
 (define (create-draw-juggler draw-rectangle draw-line)
-  (define (draw-arm pos)
-    (let ((arm-size (vec2 10.0 40.0))
-	  (forearm-pos (vec2-add pos (vec2 5.0 40.0)))
-	  (forearm-size (vec2 0.0 40.0)))
-      (draw-rectangle "#FFFF22" pos arm-size)
-      ;; (draw-rectangle "#FF22aa" forearm-pos forearm-size)
-      (draw-line  forearm-pos  (vec2-add  forearm-pos forearm-size)
-		  "#FF22aa" 10.0 "round")))
-  
-  (define (draw-props pos)
-    (let ((prop1 (vec2-add pos (vec2 2.0 70.0)))
-	  (prop2 (vec2-add pos (vec2 4.0 65.0)))
-	  (prop3 (vec2-add pos (vec2 8.0 70.0)))
-	  (size (vec2 10.0 10.0)))
-      (draw-rectangle "#2222ff" prop1 size)
-      (draw-rectangle "#2222ff" prop2 size)
-      (draw-rectangle "rgb(255 0 0)" prop3 size)))
-  
   (define (draw-leg pos)
     (let ((leg-size (vec2 16.0 30.0))
 	  (calf-pos (vec2-add pos (vec2 2.0 30.0)))

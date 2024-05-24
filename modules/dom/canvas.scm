@@ -40,7 +40,10 @@
 	    line-cap
 	    stroke
 	    stroke-style
-	    ))
+	    save
+	    rotate
+	    restore
+	    translate))
 
 ;; HTMLCanvasElement
 (define-foreign get-context
@@ -96,7 +99,6 @@
   "canvas" "lineWidth"
   (ref extern)  f64 -> none)
 
-
 (define-foreign stroke-style
   "canvas" "strokeStyle"
   (ref extern)  (ref string) -> none)
@@ -108,3 +110,20 @@
 (define-foreign stroke
   "canvas" "stroke"
   (ref extern)  -> none)
+
+(define-foreign save
+  "canvas" "save"
+  (ref extern) -> none)
+
+(define-foreign restore
+  "canvas" "restore"
+  (ref extern) -> none)
+
+(define-foreign rotate
+  "canvas" "rotate"
+  (ref extern) f64 -> none)
+
+(define-foreign translate
+  "canvas" "translate"
+  (ref extern) f64 f64 -> none)
+
