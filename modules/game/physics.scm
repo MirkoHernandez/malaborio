@@ -28,7 +28,10 @@
 	    set-particle-pos))
 
 (define-record-type <particle>
-  (make-particle)
+  (make-particle particle-pos particle-vel particle-accel
+		 particle-force particle-damping
+		 particle-inverse-mass
+		 particle-active particle-elapsed-time)
   particle?
   ;; inverse-mass - less, harder to move; 0 unmovable object.
   (particle-inverse-mass particle-inverse-mass set-particle-inverse-mass)

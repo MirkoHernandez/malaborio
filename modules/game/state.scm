@@ -13,12 +13,31 @@
   #:export (<state>
 	    init-state
 	    ball 
-	    player-pos
-	    set-player-pos
 	    make-state
 	    set-debug
 	    init-props
+	    player-particle 
+	    get-player
 	    *state*))
+
+(define-record-type <arm>
+  (make-arm)
+  arm?
+  (shoulder shoulder set-shoulder)
+  (elbow elbow set-elbow)
+  (hand hand  set-hand))
+
+(define-record-type <player>
+  (make-player particle l-arm r-arm)
+  player?
+  (particle player-particle set-player-particle)
+  (l-arm player-l-arm set-player-l-arm)
+  (r-arm player-r-arm set-player-r-arm))
+
+(define-record-type <state>
+  (make-state)
+  state?
+  (player get-player set-player))
 
 (define (init-props max-props)
   (let ((props (make-eq-hashtable)))
@@ -29,39 +48,62 @@
 	(loop max (+ i 1))))
     props))
 
-(define-record-type <state>
-  (make-state)
-  state?
-  (player-pos player-pos set-player-pos))
-
 (define *state* (make-state))
 
 (define (init-ball)
-  (let ((ball (make-particle) ))
-    (set-particle-pos ball (vec2 120.0 20.0))
-    (set-particle-vel ball (vec2 0.0 0.0))
-    (set-particle-force ball (vec2 0.0 0.0))
-    ;; Set gravity 
-    (set-particle-accel ball (vec2 0.0 480.0))
-    (set-particle-damping ball 0.99)
-    (set-particle-inverse-mass ball 100)
-    (set-particle-active ball #t)
-    (set-particle-elapsed ball 0)
-    ball))
+  (make-particle
+   (vec2 120.0 20.0)
+   (vec2 0.0 0.0)
+   ;; gravity 
+   (vec2 0.0 480.0)
+   ;; force
+   (vec2 0.0 0.0)
+   ;; damping
+   0.99
+   ;; inverse-mass
+   100
+   ;;active
+   #t
+   0
+   ))
 
 (define (init-club)
-  (let ((club (make-particle) ))
-    (set-particle-pos club (vec2 120.0 20.0))
-    (set-particle-vel club (vec2 0.0 0.0))
-    (set-particle-force club (vec2 0.0 0.0))
-    ;; Set gravity 
-    (set-particle-accel club (vec2 0.0 480.0))
-    (set-particle-damping club 0.99)
-    (set-particle-inverse-mass club 100)
-    (set-particle-active club #t)
-    (set-particle-elapsed club 0)
-    club))
+  (make-particle
+   (vec2 120.0 20.0)
+   (vec2 0.0 0.0)
+  ;; gravity 
+   (vec2 0.0 480.0)
+   ;; force
+   (vec2 0.0 0.0)
+   ;; damping
+   0.99
+   ;; inverse-mass
+   100
+   ;;active
+   #t
+   0
+))
+
+
+(define (init-player-particle)
+  (make-particle
+   (vec2 120.0 200.0)
+   (vec2 0.0 0.0)
+   ;; gravity 
+   (vec2 0.0 0.0)
+   ;; force
+   (vec2 0.0 0.0)
+   ;; damping
+   0.99
+   ;; inverse-mass
+   200
+   ;;active
+   #f
+   0))
 
 (define (init-state state)
-  ;; (init-ball (ball state))
-  (set-player-pos state (vec2 200.0 200.0)))
+  (set-player state (make-player
+		     (init-player-particle)
+		     (make-arm)
+		     (make-arm)))
+)

@@ -131,15 +131,9 @@
 			   0.2))))
 
 (define (create-draw-arm draw-line)
-  (lambda (pos)
-    
-    (let ((elbow-pos (vec2-add  pos (vec2 0.0 30.0 ))))
-      
-      (draw-line  pos
+  (lambda (shoulder-pos elbow-pos hand-pos)
+      (draw-line  shoulder-pos
 		  elbow-pos 
 		  "#aaccbb" 10.0 "round")
-      
-      (draw-line  elbow-pos  (vec2-add  elbow-pos
-					(vec2 0.0 30.0)
-					)
-		  "#FF22aa" 10.0 "round"))))
+      (draw-line  elbow-pos  hand-pos
+		  "#FF22aa" 10.0 "round")))
