@@ -13,6 +13,7 @@
 	    create-draw-chair-row
 	    create-draw-juggler
 	    create-draw-arm
+	    create-draw-props
 	    create-draw-line))
 
 (define (create-draw-rectangle context)
@@ -111,15 +112,23 @@
 			(vec2 (+ (vec2-x size) gap)
 			      0.0 )))))))
 
-(define (create-draw-props draw-rectangle)
-  (lambda (pos) 
-    (let ((prop1 (vec2-add pos (vec2 2.0 70.0)))
-	  (prop2 (vec2-add pos (vec2 4.0 65.0)))
-	  (prop3 (vec2-add pos (vec2 8.0 70.0)))
-	  (size (vec2 10.0 10.0)))
-      (draw-rectangle "#2222ff" prop1 size)
-      (draw-rectangle "#2222ff" prop2 size)
-      (draw-rectangle "rgb(255 0 0)" prop3 size))))
+(define (create-draw-props  draw-rotated-sprite)
+  (lambda (prop pos size number)
+    (when (> number 0) 
+      (draw-rotated-sprite prop
+			   pos 
+			   size 
+			   0.2))
+    (when (> number 1) 
+      (draw-rotated-sprite prop
+			   (vec2-add pos  (vec2 -5.0 -2.0))
+			   size 
+			   0.2))
+    (when (> number 2) 
+      (draw-rotated-sprite prop
+			   (vec2-add pos  (vec2 5.0 5.0))
+			   size 
+			   0.2))))
 
 (define (create-draw-arm draw-line)
   (lambda (pos)
