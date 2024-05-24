@@ -84,11 +84,9 @@
   ;; input
   (cond 
    ((button-was-down (input-action *game-input*))
-    (launch-ball (player-pos *state*))
-    )
+    (launch-ball (player-pos *state*)))
    ((button-was-down (input-one *game-input*))
-    (pk "placeholder")
-    )
+    (pk "placeholder"))
    ((button-was-down (input-fullscreen *game-input*))
     (toggle-fullscreen))
    ;; player movement
@@ -100,27 +98,32 @@
     (vec2-add! (player-pos *state*) (vec2 0.0 5.0)))
    ((button-was-down-repeat (input-up *game-input*))
     (vec2-add! (player-pos *state*) (vec2 0.0 -5.0))))
-
+  
   (let loop ((max active-props)
 	     (i 1))
     (when (<= i active-props)
       (let ((prop  (hashtable-ref props i))
 	    (floor-pos (+ (vec2-y (player-pos *state*)) 160)))
-
+	;; gravity
 	(when (particle-active prop)
 	  (integrate-particle  prop dt)
-	  ;; collision
-	  (when (> (vec2-y (particle-pos prop))
-		   floor-pos)
+	  (set-particle-elapsed  prop
+				 (+  (particle-elapsed prop)
+				  dt))
+	  ;; collision of prop with the floor
+	  (when (and (> (vec2-y (particle-pos prop))
+			floor-pos))
 	    (if (not (equal? (particle-active prop) 'rebound))
 		(begin	
 		  (set-vec2-y! (particle-pos prop) floor-pos)
 		  (set-vec2-y! (particle-vel prop) -30)
 		  (set-vec2-x! (particle-vel prop) 6)
 		  (set-particle-active prop 'rebound))
-		(set-particle-active prop #f)))))
+		(begin 
+		  (set-particle-active prop #f))
+		))))
       (loop max (+ i 1))))
-
+  
   ;; player collision
   (vec2-clamp! (player-pos *state*)
 	       24.0 2.0 (- game-width 40) 125.0)
@@ -134,6 +137,8 @@
 (define context (get-context canvas "2d"))
 
 (define image:ball (make-image "assets/images/ball.png"))
+(define image:head (make-image "assets/images/head.png"))
+(define image:head2 (make-image "assets/images/head2.png"))
 (define image:club (make-image "assets/images/club.png"))
 
 (define game-width    640.0)
@@ -144,12 +149,14 @@
 
 (define draw-rectangle (create-draw-rectangle context))
 (define draw-sprite (create-draw-sprite context))
+(define draw-rotated-sprite (create-draw-rotated-sprite context))
 
 (define draw-chair (create-draw-chair draw-rectangle))
 (define draw-chair-row (create-draw-chair-row draw-chair))
 
 (define draw-line (create-draw-line context))
 (define draw-juggler (create-draw-juggler draw-rectangle draw-line))
+(define draw-arm (create-draw-arm  draw-line))
 
 (define max-active-props 10)
 (define props (init-props max-active-props))
@@ -172,31 +179,47 @@
   
   (draw-rectangle "#4a281b" (vec2 0.0 280.0)
 		  (vec2 640.0 10.0))
+
   
+  ;; Draw falling props
   (let loop ((max active-props)
 	     (i 1))
     (when (<= i active-props)
       (when (not (particle-active (hashtable-ref props i)))
-	(draw-sprite image:ball
-		     (particle-pos
-		      (hashtable-ref props i))
-		     (vec2 16.0 16.0)))
+	(draw-rotated-sprite image:ball
+			     (particle-pos
+			      (hashtable-ref props i))
+			     (vec2 16.0 16.0)
+			     (particle-elapsed (hashtable-ref props i))))
       (loop max (+ i 1))))
   
   (draw-juggler (player-pos *state*))
-  
+  (draw-arm (vec2-add (player-pos *state*) (vec2 -18.0 25.0 )))
+  (draw-arm (vec2-add (player-pos *state*) (vec2 40.0 25.0 )))
+
+
+  ;; Draw moving props
   (let loop ((max active-props)
 	     (i 1))
     (when (<= i active-props)
       (when (particle-active (hashtable-ref props i))
-
-	(draw-sprite image:ball
-		     (particle-pos
-		      (hashtable-ref props i))
-		     (vec2 16.0 16.0)))
+	(draw-rotated-sprite image:ball
+			     (particle-pos
+			      (hashtable-ref props i))
+			     (vec2 16.0 16.0)
+			     (/ (particle-elapsed (hashtable-ref props i))
+				190.0)))
       (loop max (+ i 1))))
   
-  (draw-chair-row (vec2 20.0 380) (vec2 70.0 60.0) game-width 15.0)
+  (draw-sprite image:head2
+	       (vec2 175.0 334.0) 
+	       (vec2 64.0 64.0))
+  
+  (draw-sprite image:head
+	       (vec2 280.0 334.0) 
+	       (vec2 64.0 64.0))
+  
+  (draw-chair-row (vec2 15.0 380) (vec2 70.0 60.0) game-width 15.0)
   (draw-chair-row (vec2 0.0 420) (vec2 70.0 60.0) game-width 15.0)
   
   (request-animation-frame draw-callback))
