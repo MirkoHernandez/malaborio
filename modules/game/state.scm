@@ -22,7 +22,6 @@
 
 (define (init-props max-props)
   (let ((props (make-eq-hashtable)))
-    
     (let loop ((max max-props)
 	       (i 1))
       (when (<= i max)
@@ -47,6 +46,7 @@
     (set-particle-damping ball 0.99)
     (set-particle-inverse-mass ball 100)
     (set-particle-active ball #t)
+    (set-particle-elapsed ball 0)
     ball))
 
 (define (init-club)
@@ -59,6 +59,7 @@
     (set-particle-damping club 0.99)
     (set-particle-inverse-mass club 100)
     (set-particle-active club #t)
+    (set-particle-elapsed club 0)
     club))
 
 (define (init-state state)

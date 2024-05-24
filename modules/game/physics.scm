@@ -17,12 +17,14 @@
 	    particle-accel
 	    particle-force
 	    particle-active
+	    particle-elapsed 
 	    set-particle-active
 	    set-particle-inverse-mass
 	    set-particle-accel 
 	    set-particle-vel 
 	    set-particle-damping
-	    set-particle-force 
+	    set-particle-force
+	    set-particle-elapsed 
 	    set-particle-pos))
 
 (define-record-type <particle>
@@ -35,6 +37,7 @@
   (particle-pos particle-pos set-particle-pos)
   (particle-vel particle-vel set-particle-vel)
   (particle-accel particle-accel set-particle-accel)
+  (particle-elapsed-time particle-elapsed set-particle-elapsed)
   ;; NOTE: this should be a separate property of another object (prop)
   ;; but I did not manage to use the #:parent property.
   (particle-active particle-active set-particle-active))
