@@ -68,12 +68,6 @@
 	   ;; hip
 	   (hip-pos (vec2-add pos (vec2 -10.0 60.0)))
 	   (hip-size (vec2 40 20))
-	   
-	   ;; NOTE: left and right in relation to the screen.
-	   
-	   ;; arms 
-	   (left-arm-pos (vec2-add pos (vec2 -22.0 20.0)))
-	   (right-arm-pos (vec2-add pos (vec2 32.0 20.0)))
 	   ;; legs
 	   (left-leg-pos (vec2-add pos (vec2 -8.0 80.0)))
 	   (right-leg-pos (vec2-add pos (vec2 12.0 80.0))))
@@ -83,11 +77,6 @@
       ;; torso
       (draw-rectangle "#AAbbff" torso-pos torso-size)
       (draw-rectangle "#aabbff" hip-pos hip-size)
-      ;; arms
-      (draw-arm left-arm-pos)
-      (draw-arm right-arm-pos)
-      ;; props
-      (draw-props left-arm-pos)
       ;; legs
       (draw-leg left-leg-pos)
       (draw-leg right-leg-pos)))
@@ -121,3 +110,27 @@
 	(loop (vec2-add start
 			(vec2 (+ (vec2-x size) gap)
 			      0.0 )))))))
+
+(define (create-draw-props draw-rectangle)
+  (lambda (pos) 
+    (let ((prop1 (vec2-add pos (vec2 2.0 70.0)))
+	  (prop2 (vec2-add pos (vec2 4.0 65.0)))
+	  (prop3 (vec2-add pos (vec2 8.0 70.0)))
+	  (size (vec2 10.0 10.0)))
+      (draw-rectangle "#2222ff" prop1 size)
+      (draw-rectangle "#2222ff" prop2 size)
+      (draw-rectangle "rgb(255 0 0)" prop3 size))))
+
+(define (create-draw-arm draw-line)
+  (lambda (pos)
+    
+    (let ((elbow-pos (vec2-add  pos (vec2 0.0 30.0 ))))
+      
+      (draw-line  pos
+		  elbow-pos 
+		  "#aaccbb" 10.0 "round")
+      
+      (draw-line  elbow-pos  (vec2-add  elbow-pos
+					(vec2 0.0 30.0)
+					)
+		  "#FF22aa" 10.0 "round"))))
