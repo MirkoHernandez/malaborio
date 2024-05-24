@@ -18,7 +18,11 @@
 	    init-props
 	    player-particle 
 	    get-player
-	    *state*))
+	    *state*
+	    set-shoulder
+	    shoulder
+	    player-l-arm 
+	    ))
 
 (define-record-type <arm>
   (make-arm)
