@@ -35,10 +35,12 @@
             set-vec2-y!
             vec2-add
             vec2-add!
+            vec2-sub
             vec2-sub!
             vec2-mul-scalar
             vec2-mul-scalar!
             vec2-magnitude
+            vec2-magnitude-sqr
             vec2-normalize!
             vec2-clamp!))
 
@@ -79,6 +81,11 @@
   (set-vec2-x! v (+ (vec2-x v) (vec2-x w)))
   (set-vec2-y! v (+ (vec2-y v) (vec2-y w))))
 
+(define (vec2-sub v w)
+  (vec2 
+   (- (vec2-x v) (vec2-x w))
+   (- (vec2-y v) (vec2-y w))))
+
 (define (vec2-sub! v w)
   (set-vec2-x! v (- (vec2-x v) (vec2-x w)))
   (set-vec2-y! v (- (vec2-y v) (vec2-y w))))
@@ -93,6 +100,9 @@
 
 (define (vec2-magnitude v)
   (sqrt (+ (* (vec2-x v) (vec2-x v)) (* (vec2-y v) (vec2-y v)))))
+
+(define (vec2-magnitude-sqr v)
+  (+ (* (vec2-x v) (vec2-x v)) (* (vec2-y v) (vec2-y v))))
 
 (define (vec2-normalize! v)
   (unless (and (= (vec2-x v) 0.0) (= (vec2-y v) 0.0))
