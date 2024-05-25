@@ -62,26 +62,32 @@
 	 (when (external-null? (full-screen-element document))
 	   (request-full-screen canvas)))))
 
-(define (launch-ball player)
+(define (launch-prop player)
   (let ((player-pos (particle-pos (player-particle player))))
     (set! launched-props (+ 1 launched-props ))
     (when (< active-props max-active-props)
       (set! active-props (+ active-props 1))
-      (let ((ball (hashtable-ref props active-props)))
+      (let ((prop (hashtable-ref props active-props)))
 	;; Reduce current velocity (Simulate a hand grabbing the prop)
 	;; (set-vec2-y!
-	;; (particle-vel ball) 0)
+	;; (particle-vel prop) 0)
 	(set-vec2-x!
-	 (particle-pos ball)
+	 (particle-pos prop)
 	 (- (vec2-x player-pos)
 	    20))
 	(set-vec2-y!
-	 (particle-pos ball)
+	 (particle-pos prop)
 	 (+ (vec2-y player-pos)
 	    90))
-	(set-vec2-y! (particle-force ball) -280)
-	(set-vec2-x! (particle-force ball) 25))))
+	(set-vec2-y! (particle-vel prop) -5)
+	(set-vec2-y! (particle-force prop) -280)
+	(set-vec2-x! (particle-force prop) 25))))
   )
+
+(define (change-prop)
+  (set! props (init-props max-active-props 'club))
+  (set! current-prop image:club))
+
 
 (define (move-player player action)
   ;; update force.
@@ -274,9 +280,11 @@
     
     (cond 
      ((button-was-down (input-action *game-input*))
-      (launch-ball (get-player *state*)))
+      (launch-prop (get-player *state*)))
      ((button-was-down (input-one *game-input*))
       (set! pause? #t))
+     ((button-was-down (input-two *game-input*))
+      (change-prop))
      ((button-was-down (input-fullscreen *game-input*))
       (toggle-fullscreen))
      ;; player movement
@@ -348,7 +356,7 @@
 (define max-active-props 10)
 (define fallen-props 0)
 (define launched-props 0)
-(define props (init-props max-active-props))
+(define props (init-props max-active-props 'ball))
 
 (define active-props 0)
 
@@ -377,7 +385,7 @@
 	       (i 1))
       (when (<= i active-props)
 	(when (not (particle-active (hashtable-ref props i)))
-	  (draw-rotated-sprite image:ball
+	  (draw-rotated-sprite current-prop
 			       (particle-pos
 				(hashtable-ref props i))
 			       (particle-size (hashtable-ref props i))
@@ -394,22 +402,23 @@
 	      (elbow (player-l-arm player)) 
 	      (hand (player-l-arm player)))
 
-    (draw-props image:ball
+    (draw-props current-prop
 		(hand (player-r-arm player))
-		 (vec2 16.0 16.0)
-			  ;; TODO: handle properly when juggling mechanic is done. 
-			  (if (< fallen-props 7) 3
-			      (- max-active-props launched-props)))
+		(particle-size (hashtable-ref props 1))
+		;; TODO: handle properly when juggling mechanic is done. 
+		(if (< fallen-props 7) 3
+		    (- max-active-props launched-props)))
     
     ;; Draw moving props
     (let loop ((max active-props)
 	       (i 1))
       (when (<= i active-props)
 	(when (particle-active (hashtable-ref props i))
-	  (draw-rotated-sprite image:ball
+	  (draw-rotated-sprite current-prop
 			       (particle-pos
 				(hashtable-ref props i))
-			       (vec2 16.0 16.0)
+			       (particle-size
+				(hashtable-ref props i))
 			       (/ (particle-elapsed (hashtable-ref props i))
 				  190.0)))
 	(loop max (+ i 1))))

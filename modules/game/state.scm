@@ -51,51 +51,55 @@
   state?
   (player get-player set-player))
 
-(define (init-props max-props)
+(define (init-props max-props prop-type)
   (let ((props (make-eq-hashtable)))
     (let loop ((max max-props)
 	       (i 1))
       (when (<= i max)
-	(hashtable-set! props i (init-club))
+	(hashtable-set! props i
+			(init-prop prop-type)
+			)
 	(loop max (+ i 1))))
     props))
 
+
 (define *state* (make-state))
 
-(define (init-ball)
-  (make-particle
-   (vec2 120.0 20.0)
-   (vec2 0.0 0.0)
-   ;; gravity 
-   (vec2 0.0 480.0)
-   ;; force
-   (vec2 0.0 0.0)
-   ;; damping
-   0.99
-   ;; inverse-mass
-   100
-   ;;active
-   #t
-   0
-   (vec2 16.0 16.0)
-   ))
-
-(define (init-club)
-  (make-particle
-   (vec2 120.0 20.0)
-   (vec2 0.0 0.0)
-  ;; gravity 
-   (vec2 0.0 480.0)
-   ;; force
-   (vec2 0.0 0.0)
-   ;; damping
-   0.99
-   ;; inverse-mass
-   100
-   ;;active
-   #t
-   0
-   (vec2 16.0 32.0)))
+(define (init-prop prop-type)
+  (case prop-type
+    ((ball)
+     (make-particle
+      (vec2 120.0 20.0)
+      (vec2 0.0 0.0)
+      ;; gravity 
+      (vec2 0.0 480.0)
+      ;; force
+      (vec2 0.0 0.0)
+      ;; damping
+      0.99
+      ;; inverse-mass
+      100
+      ;;active
+      #t
+      0
+      (vec2 16.0 16.0)
+      ))
+    ((club)
+     (make-particle
+      (vec2 120.0 20.0)
+      (vec2 0.0 0.0)
+      ;; gravity 
+      (vec2 0.0 480.0)
+      ;; force
+      (vec2 0.0 0.0)
+      ;; damping
+      0.99
+      ;; inverse-mass
+      100
+      ;;active
+      #t
+      0
+      (vec2 16.0 32.0)))))
 
 (define (init-player-particle)
   (make-particle
