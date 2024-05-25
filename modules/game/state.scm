@@ -20,16 +20,24 @@
 	    get-player
 	    *state*
 	    set-shoulder
+	    set-elbow
+	    set-hand
 	    shoulder
-	    player-l-arm 
-	    ))
+	    size-upper-arm 
+	    size-forearm
+	    elbow
+	    hand
+	    player-r-arm
+	    player-l-arm))
 
 (define-record-type <arm>
   (make-arm)
   arm?
   (shoulder shoulder set-shoulder)
   (elbow elbow set-elbow)
-  (hand hand  set-hand))
+  (hand hand  set-hand)
+  (size-upper-arm  size-upper-arm set-size-upper-arm)
+  (size-forearm  size-forearm set-size-forearm))
 
 (define-record-type <player>
   (make-player particle l-arm r-arm)
@@ -48,7 +56,7 @@
     (let loop ((max max-props)
 	       (i 1))
       (when (<= i max)
-	(hashtable-set! props i (init-ball))
+	(hashtable-set! props i (init-club))
 	(loop max (+ i 1))))
     props))
 
@@ -69,6 +77,7 @@
    ;;active
    #t
    0
+   (vec2 16.0 16.0)
    ))
 
 (define (init-club)
@@ -86,8 +95,7 @@
    ;;active
    #t
    0
-))
-
+   (vec2 16.0 32.0)))
 
 (define (init-player-particle)
   (make-particle
@@ -98,16 +106,37 @@
    ;; force
    (vec2 0.0 0.0)
    ;; damping
-   0.99
+   0.70
    ;; inverse-mass
-   200
+   500
    ;;active
    #f
-   0))
+   0
+   (vec2 60.0 180.0)))
+
+(define (init-player player)
+  (let ((player-pos (particle-pos (player-particle player)))
+	(l-arm (player-l-arm player))
+	(r-arm (player-r-arm player)))
+    
+    (set-size-upper-arm l-arm 25.0)
+    (set-size-forearm l-arm 30.0)
+    
+    (set-shoulder l-arm (vec2 20.0 20.0))
+    (set-elbow l-arm (vec2 400.0 20.0))
+    (set-hand l-arm (vec2 400.0 20.0))
+
+
+    (set-size-upper-arm r-arm 25.0)
+    (set-size-forearm r-arm 30.0)
+    (set-shoulder r-arm (vec2 20.0 20.0))
+    (set-elbow r-arm (vec2 400.0 20.0))
+    (set-hand r-arm (vec2 400.0 20.0))
+    ))
 
 (define (init-state state)
   (set-player state (make-player
 		     (init-player-particle)
 		     (make-arm)
 		     (make-arm)))
-)
+  (init-player (get-player state)))

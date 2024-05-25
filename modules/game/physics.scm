@@ -17,7 +17,9 @@
 	    particle-accel
 	    particle-force
 	    particle-active
-	    particle-elapsed 
+	    particle-elapsed
+	    particle-size
+	    set-particle-size 
 	    set-particle-active
 	    set-particle-inverse-mass
 	    set-particle-accel 
@@ -31,7 +33,8 @@
   (make-particle particle-pos particle-vel particle-accel
 		 particle-force particle-damping
 		 particle-inverse-mass
-		 particle-active particle-elapsed-time)
+		 particle-active particle-elapsed-time
+		 particle-size)
   particle?
   ;; inverse-mass - less, harder to move; 0 unmovable object.
   (particle-inverse-mass particle-inverse-mass set-particle-inverse-mass)
@@ -43,7 +46,8 @@
   (particle-elapsed-time particle-elapsed set-particle-elapsed)
   ;; NOTE: this should be a separate property of another object (prop)
   ;; but I did not manage to use the #:parent property.
-  (particle-active particle-active set-particle-active))
+  (particle-active particle-active set-particle-active)
+  (particle-size particle-size set-particle-size))
 
 (define (integrate-particle particle dt)
   (let ((dt (inexact (/ dt  1000)) ))

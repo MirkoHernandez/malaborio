@@ -80,10 +80,10 @@
 	 (+ (vec2-y player-pos)
 	    90))
 	(set-vec2-y! (particle-force ball) -280)
-	(set-vec2-x! (particle-force ball) 15))))
+	(set-vec2-x! (particle-force ball) 25))))
   )
 
-(define (update-player player action)
+(define (move-player player action)
   ;; update force.
   (case action
     ((up)
@@ -98,80 +98,222 @@
     ((left)
      (vec2-add! (particle-force
 		 (player-particle player)) (vec2 -16.0 0.0)))
-    (else    (pk "else")))
+    (else    (pk "else"))))
+
+(define (update-player player)
+  ;; right arm
+  (set-shoulder (player-r-arm player)
+		(vec2-add
+		 (particle-pos
+		  (player-particle player))
+		 (vec2 -18.0 25.0)))
+  
+  (set-elbow (player-r-arm player)
+	     (vec2-add
+	      (shoulder (player-r-arm player))
+	      (vec2 0.0 (size-upper-arm (player-r-arm player)))))
+  
+  (set-hand (player-r-arm player)
+	    (vec2-add
+	     (elbow (player-r-arm player))
+	     (vec2 0.0 (size-forearm (player-r-arm player)))))
+  
+  ;; left arm
+  (set-shoulder (player-l-arm player)
+		(vec2-add
+		 (particle-pos
+		  (player-particle player))
+		 (vec2 40.0 25.0)))
+  
+  (set-elbow (player-l-arm player)
+	     (vec2-add
+	      (shoulder (player-l-arm player))
+	      (vec2 0.0 (size-upper-arm (player-l-arm player)))))
+  
+  (set-hand (player-l-arm player)
+	    (vec2-add
+	     (elbow (player-l-arm player))
+	     (vec2 0.0 (size-forearm (player-l-arm player)))))
+  
+  (let loop ((max active-props)
+	     (i 1))
+    (when (<= i active-props)
+      (let* ((prop  (hashtable-ref props i))
+	     (prop-pos (particle-pos prop))
+	     (hand-pos (hand  (player-l-arm player)))
+	     (r-hand-pos (hand  (player-r-arm player)))
+	     (shoulder-pos (shoulder  (player-l-arm player)))
+	     (r-shoulder-pos (shoulder  (player-r-arm player))))
+
+	;; an active prop is near the left hand
+	(when (and (particle-active prop)
+		   (< (vec2-x prop-pos) (+ (vec2-x shoulder-pos)
+					   (size-forearm (player-l-arm player))))
+		   (< (vec2-y prop-pos) (+ (vec2-y shoulder-pos)
+					   (size-forearm (player-l-arm player))))
+		   (> (vec2-x prop-pos) (- (vec2-x shoulder-pos)
+					   (size-forearm (player-l-arm player))))
+		   (> (vec2-y prop-pos) (- (vec2-y shoulder-pos)
+					   (size-forearm (player-l-arm player)))))
+	  ;; move hand closer to the prop
+	  (set-elbow (player-l-arm player)
+		     (vec2-add
+		      (elbow (player-l-arm player))
+		      (vec2
+		       (* 0.1 (- (vec2-x prop-pos) (vec2-x hand-pos)))
+		       0.0)))
+	  (set-hand (player-l-arm player)
+		    
+		    (vec2-add
+		     (elbow (player-l-arm player))
+		     (vec2
+		      (* 0.1 (- (vec2-x prop-pos) (vec2-x hand-pos)))
+		      (* 0.1 (- (vec2-y prop-pos) (vec2-y hand-pos)))))
+		    ))
+	
+	;; an active prop is near the right hand 
+	(when (and (equal? (particle-active prop) 'to-right-hand)
+		   (< (vec2-x prop-pos) (+ (vec2-x r-shoulder-pos)
+					   (size-forearm (player-r-arm player))))
+		   (< (vec2-y prop-pos) (+ (vec2-y r-shoulder-pos)
+					   (size-forearm (player-r-arm player))))
+		   (> (vec2-x prop-pos) (- (vec2-x r-shoulder-pos)
+					   (size-forearm (player-r-arm player))))
+		   (> (vec2-y prop-pos) (- (vec2-y r-shoulder-pos)
+					   (size-forearm (player-r-arm player)))))
+	  ;; move hand closer to the prop
+	  (set-elbow (player-r-arm player)
+		     (vec2-add
+		      (elbow (player-r-arm player))
+		      (vec2
+		       (* 0.1 (- (vec2-x prop-pos) (vec2-x r-hand-pos)))
+		       0.0)))
+	  (set-hand (player-r-arm player)
+		    (vec2-add
+		     (elbow (player-r-arm player))
+		     (vec2
+		      (* 0.1 (- (vec2-x prop-pos) (vec2-x r-hand-pos)))
+		      (* 0.1 (- (vec2-y prop-pos) (vec2-y r-hand-pos)))))
+		    )))
+
+      (loop max (+ i 1)))))
 
 
-  ;; update arms position
-  (set-shoulder (player-l-arm player) (vec2-add
-				       (particle-pos
-					(player-particle player))
-				       (vec2 40.0 20.0))))
+(define (rectangle-collision? v1 s1 v2 s2)
+  (and (< (vec2-x v1)
+	  (+ (vec2-x v2) (vec2-x s2)))
+       (< (vec2-y v1)
+	  (+ (vec2-y v2) (vec2-y s2)))
+       (> (+ (vec2-x v1) (vec2-x s1)) (vec2-x v2))
+       (> (+ (vec2-y v1) (vec2-y s1)) (vec2-y v2))))
+
+(define (update-props player dt)
+  (let ((player-pos (particle-pos (player-particle player)) ))
+    (let loop ((max active-props)
+	       (i 1))
+      (when (<= i active-props)
+	(let ((prop  (hashtable-ref props i))
+	      (floor-pos (+ (vec2-y player-pos) 160)))
+
+	  ;; prop near left hand
+	  (when (rectangle-collision? (particle-pos prop)
+				      (particle-size prop)
+				      (hand (player-l-arm player))
+				      (vec2 5.0 5.0))
+	    
+	    (when (> (vec2-y (particle-vel prop)) 0)
+	      (equal? (particle-active prop) 'to-right-hand)
+	      (set-vec2-y! (particle-vel prop) -5)
+	      (set-vec2-y! (particle-force prop) -280)
+	      (set-vec2-x! (particle-force prop) -25)
+	      (set-particle-active prop 'to-right-hand)))
+	  
+	  ;; prop near right hand
+	  (when (rectangle-collision? (particle-pos prop)
+				      (particle-size prop)
+				      (hand (player-r-arm player))
+				      (vec2 5.0 5.0))
+	    (when (> (vec2-y (particle-vel prop)) 0)
+	      (set-vec2-y! (particle-vel prop) -5)
+	      (set-vec2-y! (particle-force prop) -280)
+	      (set-vec2-x! (particle-force prop) 25)
+	      (set-particle-active prop 'to-left-hand)))
+	  
+	  ;; gravity
+	  (when (particle-active prop)
+	    (integrate-particle  prop dt)
+	    (set-particle-elapsed  prop
+				   (+  (particle-elapsed prop)
+				       dt))
+	    
+	    ;; collision of prop with the floor
+	    (when (and (> (vec2-y (particle-pos prop))
+			  floor-pos))
+	      (if (not (equal? (particle-active prop) 'rebound))
+		  (begin
+		    (media-play audio:crash)
+		    (set-vec2-y! (particle-pos prop) floor-pos)
+		    (set-vec2-y! (particle-vel prop) -30)
+		    (set-vec2-x! (particle-vel prop) 6)
+		    (set-particle-active prop 'rebound))
+		  (begin
+		    (when (particle-active prop)
+		      (set! fallen-props (+ fallen-props 1)))
+		    (set-particle-active prop #f))
+		  ))))
+	(loop max (+ i 1)))))
+  )
+
+(define pause? #f)
 
 (define (update)
   ;; input
   (let* (
 	 (player (get-player *state*))
 	 (player-pos (particle-pos (player-particle player)) ))
-  
-  (cond 
-   ((button-was-down (input-action *game-input*))
-    (launch-ball (get-player *state*)))
-   ((button-was-down (input-one *game-input*))
-    (pk "placeholder"))
-   ((button-was-down (input-fullscreen *game-input*))
-    (toggle-fullscreen))
-   ;; player movement
-   ((button-was-down-repeat (input-left *game-input*))
-    (update-player (get-player *state*) 'left))
-   ((button-was-down-repeat (input-right *game-input*))
-    (update-player (get-player *state*) 'right))
-   ((button-was-down (input-down *game-input*))
-    (update-player (get-player *state*) 'down))
-   ((button-was-down (input-up *game-input*))
-    (update-player (get-player *state*) 'up)))
-
-  (integrate-particle  (player-particle player) dt)
-
-  (let loop ((max active-props)
-	     (i 1))
     
-    (when (<= i active-props)
-      (let ((prop  (hashtable-ref props i))
-	    (floor-pos (+ (vec2-y player-pos) 160)))
-	
-	;; gravity
-	(when (particle-active prop)
-	  (integrate-particle  prop dt)
-	  (set-particle-elapsed  prop
-				 (+  (particle-elapsed prop)
-				     dt))
-	  
-	  ;; collision of prop with the floor
-	  (when (and (> (vec2-y (particle-pos prop))
-			floor-pos))
-	    (if (not (equal? (particle-active prop) 'rebound))
-		(begin	
-		  (set-vec2-y! (particle-pos prop) floor-pos)
-		  (set-vec2-y! (particle-vel prop) -30)
-		  (set-vec2-x! (particle-vel prop) 6)
-		  (set-particle-active prop 'rebound))
-		(begin
-		  (when (particle-active prop)
-		    (set! fallen-props (+ fallen-props 1)))
-		  (set-particle-active prop #f))
-		))))
-      
-      (loop max (+ i 1))))
-  
-  ;; player collision
-  (vec2-clamp! (particle-pos (player-particle player))
-	       24.0 2.0 (- game-width 40) 125.0)
-  
-  (clear-buttons *game-input*)
-  (timeout update-callback dt))
+    (cond 
+     ((button-was-down (input-action *game-input*))
+      (launch-ball (get-player *state*)))
+     ((button-was-down (input-one *game-input*))
+      (set! pause? #t))
+     ((button-was-down (input-fullscreen *game-input*))
+      (toggle-fullscreen))
+     ;; player movement
+     ((button-was-down-repeat (input-left *game-input*))
+      (move-player (get-player *state*) 'left))
+     ((button-was-down-repeat (input-right *game-input*))
+      (move-player (get-player *state*) 'right))
+     ((button-was-down-repeat (input-down *game-input*))
+      (move-player (get-player *state*) 'down))
+     ((button-was-down-repeat (input-up *game-input*))
+      (move-player (get-player *state*) 'up)))
+    
+    ;; update player
+    (integrate-particle  (player-particle player) dt)
+    (update-player player)
+
+    ;; update props
+    (update-props player dt)
+    
+    ;; player collision
+    (vec2-clamp! (particle-pos (player-particle player))
+		 24.0 2.0 (- game-width 40) 125.0)
+    
+    (clear-buttons *game-input*)
+
+    ;; for debugging only
+    (unless pause? 
+      (timeout update-callback dt)
+
+      )
+    )
   )
 
 (define update-callback (procedure->external update))
+
+;; Sound
+(define audio:crash       (make-audio "assets/sounds/crash.wav"))
 
 ;;;; Rendering
 (define context (get-context canvas "2d"))
@@ -179,7 +321,11 @@
 (define image:ball (make-image "assets/images/ball.png"))
 (define image:head (make-image "assets/images/head.png"))
 (define image:head2 (make-image "assets/images/head2.png"))
+(define image:juggler-head (make-image "assets/images/juggler-head.png"))
 (define image:club (make-image "assets/images/club.png"))
+
+
+(define current-prop image:ball)
 
 (define game-width    640.0)
 (define game-height   480.0)
@@ -234,22 +380,23 @@
 	  (draw-rotated-sprite image:ball
 			       (particle-pos
 				(hashtable-ref props i))
-			       (vec2 16.0 16.0)
+			       (particle-size (hashtable-ref props i))
 			       (particle-elapsed (hashtable-ref props i))))
 	(loop max (+ i 1))))
     
-
     (draw-juggler player-pos )
 
-    (draw-arm (vec2-add player-pos (vec2 -18.0 25.0 ))
-	      (vec2-add player-pos (vec2 -18.0 55.0 ))
-	      (vec2-add player-pos (vec2 -18.0 85.0 )))
-
-    (pk (shoulder (player-l-arm player)))
+    (draw-arm (shoulder (player-r-arm player))
+	      (elbow (player-r-arm player)) 
+	      (hand (player-r-arm player)))
     
+    (draw-arm (shoulder (player-l-arm player))
+	      (elbow (player-l-arm player)) 
+	      (hand (player-l-arm player)))
+
     (draw-props image:ball
-		(vec2-add (vec2 -20.0 80.0)
-			  player-pos) (vec2 16.0 16.0)
+		(hand (player-r-arm player))
+		 (vec2 16.0 16.0)
 			  ;; TODO: handle properly when juggling mechanic is done. 
 			  (if (< fallen-props 7) 3
 			      (- max-active-props launched-props)))
@@ -265,7 +412,6 @@
 			       (vec2 16.0 16.0)
 			       (/ (particle-elapsed (hashtable-ref props i))
 				  190.0)))
-	
 	(loop max (+ i 1))))
     
     (draw-sprite image:head2
@@ -285,7 +431,6 @@
   )
 
 (define draw-callback (procedure->external draw))
-
 
 ;;;; game loop
 (request-animation-frame draw-callback)
