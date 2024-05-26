@@ -347,6 +347,7 @@
 (define context (get-context canvas "2d"))
 
 (define image:ball (make-image "assets/images/ball.png"))
+(define image:ring (make-image "assets/images/ring.png"))
 (define image:head (make-image "assets/images/head.png"))
 (define image:head2 (make-image "assets/images/head2.png"))
 (define image:juggler-head (make-image "assets/images/juggler-head.png"))

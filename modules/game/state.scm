@@ -84,18 +84,35 @@
       0
       (vec2 16.0 16.0)
       ))
-    ((club)
+    ((ring)
      (make-particle
       (vec2 120.0 20.0)
       (vec2 0.0 0.0)
       ;; gravity 
-      (vec2 0.0 480.0)
+      (vec2 0.0 420.0)
       ;; force
       (vec2 0.0 0.0)
       ;; damping
       0.99
       ;; inverse-mass
-      100
+      120
+      ;;active
+      #t
+      0
+      (vec2 32.0 32.0)
+      ))
+    ((club)
+     (make-particle
+      (vec2 120.0 20.0)
+      (vec2 0.0 0.0)
+      ;; gravity 
+      (vec2 0.0 500.0)
+      ;; force
+      (vec2 0.0 0.0)
+      ;; damping
+      0.99
+      ;; inverse-mass
+      90
       ;;active
       #t
       0
