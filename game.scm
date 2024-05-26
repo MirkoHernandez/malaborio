@@ -106,6 +106,23 @@
 		 (player-particle player)) (vec2 -16.0 0.0)))
     (else    (pk "else"))))
 
+(define score 0)
+(define (update-score)
+  (let loop ((max active-props)
+	     (i 1))
+    (when (<= i active-props)
+      (when (and (particle-active (hashtable-ref props i))
+		 (not (equal? (particle-active (hashtable-ref props i))
+			      #t)))
+	;; more score depending on the time elapsed for each prop.
+	(set! score (+ score (* active-props  0.8
+				(particle-elapsed (hashtable-ref props i))))))
+      (loop max  (+ i 1))))
+
+  ;; reduce score every frame.
+  (when (> score 0)
+    (set! score (- score (* 0.05 score  active-props )))))
+
 (define (update-player player)
   ;; right arm
   (set-shoulder (player-r-arm player)
@@ -303,6 +320,9 @@
 
     ;; update props
     (update-props player dt)
+
+    ;; update score
+    (update-score)
     
     ;; player collision
     (vec2-clamp! (particle-pos (player-particle player))
@@ -361,8 +381,17 @@
 (define props (init-props max-active-props 'ball))
 (define active-props 0)
 
-
 (define (draw-ui)
+  
+  (if (< (/ score 10000) 60.0)
+      (draw-rectangle   "#fafafa" (vec2 570.0
+					20.0)
+			(vec2 10.0   (/ score 10000)))
+      
+      (draw-rectangle "#f2a233"  (vec2 570.0
+				       20.0)
+		      (vec2 10.0   60.0)))
+  
   (let loop ((max active-props)
 	     (ui-y 20.0)
 	     (i 1))
@@ -385,7 +414,7 @@
     (fill-rect context 0.0 0.0 game-width game-height)
 
     ;; stage
-    (draw-rectangle "#dddddd" (vec2 0.0 0.0)
+    (draw-rectangle "#333333" (vec2 0.0 0.0)
 		    (vec2 640.0 150.0))
     ;; floor
     (draw-rectangle "#4a281b" (vec2 0.0 150.0)
