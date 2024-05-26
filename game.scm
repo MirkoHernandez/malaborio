@@ -112,7 +112,7 @@
 		(vec2-add
 		 (particle-pos
 		  (player-particle player))
-		 (vec2 -18.0 25.0)))
+		 (vec2 2.0 42.0)))
   
   (set-elbow (player-r-arm player)
 	     (vec2-add
@@ -129,7 +129,7 @@
 		(vec2-add
 		 (particle-pos
 		  (player-particle player))
-		 (vec2 40.0 25.0)))
+		 (vec2 58.0 42.0)))
   
   (set-elbow (player-l-arm player)
 	     (vec2-add
@@ -330,6 +330,8 @@
 (define image:head (make-image "assets/images/head.png"))
 (define image:head2 (make-image "assets/images/head2.png"))
 (define image:juggler-head (make-image "assets/images/juggler-head.png"))
+(define image:juggler-head-s (make-image "assets/images/juggler-head-s.png"))
+(define image:juggler-body (make-image "assets/images/juggler-body.png"))
 (define image:club (make-image "assets/images/club.png"))
 
 
@@ -392,7 +394,7 @@
 			       (particle-elapsed (hashtable-ref props i))))
 	(loop max (+ i 1))))
     
-    (draw-juggler player-pos )
+    
 
     (draw-arm (shoulder (player-r-arm player))
 	      (elbow (player-r-arm player)) 
@@ -402,6 +404,15 @@
 	      (elbow (player-l-arm player)) 
 	      (hand (player-l-arm player)))
 
+    
+    (draw-sprite image:juggler-body
+		 player-pos 
+		 (vec2 64.0 130.0))
+    
+    (draw-sprite image:juggler-head-s
+		 (vec2-add player-pos (vec2 8.0 0.0))
+		 (vec2 64.0 64.0))
+    
     (draw-props current-prop
 		(hand (player-r-arm player))
 		(particle-size (hashtable-ref props 1))

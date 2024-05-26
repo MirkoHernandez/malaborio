@@ -133,7 +133,8 @@
 (define (create-draw-arm draw-line)
   (lambda (shoulder-pos elbow-pos hand-pos)
       (draw-line  shoulder-pos
-		  elbow-pos 
-		  "#aaccbb" 10.0 "round")
+		  elbow-pos
+		  "#333333" 10.0 "round")
       (draw-line  elbow-pos  hand-pos
-		  "#FF22aa" 10.0 "round")))
+		  "#5767bb" 10.0 "round")))
+
