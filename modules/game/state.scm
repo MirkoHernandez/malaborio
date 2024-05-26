@@ -57,8 +57,7 @@
 	       (i 1))
       (when (<= i max)
 	(hashtable-set! props i
-			(init-prop prop-type)
-			)
+			(init-prop prop-type))
 	(loop max (+ i 1))))
     props))
 

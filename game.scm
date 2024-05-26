@@ -85,8 +85,16 @@
   )
 
 (define (change-prop)
-  (set! props (init-props max-active-props 'club))
-  (set! current-prop image:club))
+  (set! fallen-props 0)
+  (set! launched-props 0)
+  (set! active-props 0)
+  (case current-stage
+    ((2)
+     (set! props (init-props max-active-props 'club))
+     (set! current-prop image:club))
+    ((3)
+     (set! props (init-props max-active-props 'ring))
+     (set! current-prop image:ring))))
 
 
 (define (move-player player action)
@@ -107,6 +115,25 @@
     (else    (pk "else"))))
 
 (define score 0)
+
+(define stage-start-time 5000)
+
+(define (check-winning-conditions)
+  (when stage-cleared?
+    (set! stage-start-time (- stage-start-time dt))
+    (when (< stage-start-time 0)
+      ;; next stage
+      (set! score 0)
+      (set! stage-start-time 5000)
+      (set! current-stage  (+ 1 current-stage))
+      (change-prop)
+      (set! stage-cleared? #f)))
+  (if (> score 5)
+      (set! stage-cleared?  #t)))
+
+(define stage-cleared?  #f)
+(define current-stage  1)
+
 (define (update-score)
   (let loop ((max active-props)
 	     (i 1))
@@ -122,7 +149,7 @@
       (loop max  (+ i 1))))
 
   ;; reduce score every frame.
-  (set! score (- score (* 0.003  active-props )))
+  (set! score (- score (* 0.002  active-props )))
   
   (when (< score 0)
     (set! score 0)))
@@ -293,8 +320,12 @@
 
 (define pause? #f)
 
+
+
+
 (define (update)
   ;; input
+  
   (let* (
 	 (player (get-player *state*))
 	 (player-pos (particle-pos (player-particle player)) ))
@@ -304,8 +335,6 @@
       (launch-prop (get-player *state*)))
      ((button-was-down (input-one *game-input*))
       (set! pause? #t))
-     ((button-was-down (input-two *game-input*))
-      (change-prop))
      ((button-was-down (input-fullscreen *game-input*))
       (toggle-fullscreen))
      ;; player movement
@@ -327,7 +356,7 @@
 
     ;; update score
     (update-score)
-    
+    (check-winning-conditions)
     ;; player collision
     (vec2-clamp! (particle-pos (player-particle player))
 		 24.0 2.0 (- game-width 40) 125.0)
@@ -423,7 +452,7 @@
     (draw-rectangle "#4a281b" (vec2 0.0 150.0)
 		    (vec2 640.0 10.0))
     
-    (draw-rectangle "#ff8822" (vec2 0.0 160.0)
+    (draw-rectangle "#f4a460" (vec2 0.0 160.0)
 		    (vec2 640.0 120.0))
     
     (draw-rectangle "#4a281b" (vec2 0.0 280.0)
@@ -481,14 +510,24 @@
 				  190.0)))
 	(loop max (+ i 1))))
     
-    (draw-sprite image:head2
+    (draw-sprite image:head
 		 (vec2 175.0 334.0) 
 		 (vec2 64.0 64.0))
     
-    (draw-sprite image:head
+    (draw-sprite image:head2
 		 (vec2 280.0 334.0) 
 		 (vec2 64.0 64.0))
     (draw-ui)
+    
+    (when stage-cleared?
+      (set-font! context "bold 16px monospace")
+      (set-fill-color! context "#fbfbfb")
+      (if (> current-stage 2) 
+	  (fill-text context "You win!!!"
+		     160.0 200.0)
+	  (begin 
+	    (fill-text context "Prepare for a new challenge!!!"
+		       160.0 200.0))))
     
     (draw-chair-row (vec2 15.0 380) (vec2 70.0 60.0) game-width 15.0)
     (draw-chair-row (vec2 0.0 420) (vec2 70.0 60.0) game-width 15.0)
