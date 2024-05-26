@@ -115,13 +115,17 @@
 		 (not (equal? (particle-active (hashtable-ref props i))
 			      #t)))
 	;; more score depending on the time elapsed for each prop.
-	(set! score (+ score (* active-props  0.8
-				(particle-elapsed (hashtable-ref props i))))))
+	(set! score (+ score
+		       ;; transform to micro seconds
+		       (/ (particle-elapsed (hashtable-ref props i))
+			  1000000))))
       (loop max  (+ i 1))))
 
   ;; reduce score every frame.
-  (when (> score 0)
-    (set! score (- score (* 0.05 score  active-props )))))
+  (set! score (- score (* 0.003  active-props )))
+  
+  (when (< score 0)
+    (set! score 0)))
 
 (define (update-player player)
   ;; right arm
@@ -383,15 +387,13 @@
 (define active-props 0)
 
 (define (draw-ui)
-  
-  (if (< (/ score 10000) 60.0)
+  (if (< score 100)
       (draw-rectangle   "#fafafa" (vec2 570.0
 					20.0)
-			(vec2 10.0   (/ score 10000)))
-      
+			(vec2 10.0   score))
       (draw-rectangle "#f2a233"  (vec2 570.0
 				       20.0)
-		      (vec2 10.0   60.0)))
+		      (vec2 10.0   100.0)))
   
   (let loop ((max active-props)
 	     (ui-y 20.0)
