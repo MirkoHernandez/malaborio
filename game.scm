@@ -333,7 +333,7 @@
 (define image:juggler-head-s (make-image "assets/images/juggler-head-s.png"))
 (define image:juggler-body (make-image "assets/images/juggler-body.png"))
 (define image:club (make-image "assets/images/club.png"))
-
+(define image:star (make-image "assets/images/star.png"))
 
 (define current-prop image:ball)
 
@@ -359,8 +359,23 @@
 (define fallen-props 0)
 (define launched-props 0)
 (define props (init-props max-active-props 'ball))
-
 (define active-props 0)
+
+
+(define (draw-ui)
+  (let loop ((max active-props)
+	     (ui-y 20.0)
+	     (i 1))
+    (when (<= i active-props)
+      (when (and (particle-active (hashtable-ref props i))
+		 (not (equal? (particle-active (hashtable-ref props i))
+			      #t)))
+	(draw-rotated-sprite image:star
+			     (vec2 550.0 ui-y) 
+			     (vec2 16.0 16.0)
+			     (/ (particle-elapsed (hashtable-ref props i)) 180))
+	(set! ui-y (+ ui-y 20.0)))
+      (loop max ui-y (+ i 1)))))
 
 (define (draw prev-time)
   (let* ((player (get-player *state*))
@@ -441,14 +456,16 @@
     (draw-sprite image:head
 		 (vec2 280.0 334.0) 
 		 (vec2 64.0 64.0))
+    (draw-ui)
     
     (draw-chair-row (vec2 15.0 380) (vec2 70.0 60.0) game-width 15.0)
     (draw-chair-row (vec2 0.0 420) (vec2 70.0 60.0) game-width 15.0)
     (request-animation-frame draw-callback)))
 
 (define (draw-testing dt)
-  (pk "test")
-  )
+  (pk "test"))
+
+
 
 (define draw-callback (procedure->external draw))
 
