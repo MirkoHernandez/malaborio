@@ -329,12 +329,8 @@
 
 (define pause? #f)
 
-
-
-
 (define (update)
   ;; input
-  
   (let* (
 	 (player (get-player *state*))
 	 (player-pos (particle-pos (player-particle player)) ))
@@ -342,10 +338,11 @@
     (cond 
      ((button-was-down (input-action *game-input*))
       (launch-prop (get-player *state*)))
-     ((button-was-down (input-one *game-input*))
-      (set! pause? #t))
-     ((button-was-down (input-fullscreen *game-input*))
-      (toggle-fullscreen))
+     ;; ((button-was-down (input-one *game-input*))
+      ;; (set! pause? #t))
+     ;; ((button-was-down (input-fullscreen *game-input*))
+      ;; (toggle-fullscreen))
+     
      ;; player movement
      ((button-was-down-repeat (input-left *game-input*))
       (move-player (get-player *state*) 'left))
@@ -372,11 +369,7 @@
     
     (clear-buttons *game-input*)
 
-    ;; for debugging only
-    (unless pause? 
       (timeout update-callback dt)
-
-      )
     )
   )
 
@@ -586,11 +579,6 @@
     
     
     (request-animation-frame draw-callback)))
-
-(define (draw-testing dt)
-  (pk "test"))
-
-
 
 (define draw-callback (procedure->external draw))
 
