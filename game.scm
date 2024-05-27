@@ -81,14 +81,16 @@
 	    90))
 	(set-vec2-y! (particle-vel prop) -5)
 	(set-vec2-y! (particle-force prop) -280)
-	(set-vec2-x! (particle-force prop) 25))))
-  )
+	(set-vec2-x! (particle-force prop) 25)))))
 
 (define (change-prop)
   (set! fallen-props 0)
   (set! launched-props 0)
   (set! active-props 0)
   (case current-stage
+    ((1)
+     (set! props (init-props max-active-props 'ball))
+     (set! current-prop image:ball))
     ((2)
      (set! props (init-props max-active-props 'club))
      (set! current-prop image:club))
@@ -124,15 +126,23 @@
     (when (< stage-start-time 0)
       ;; next stage
       (set! score 0)
-      (set! stage-start-time 5000)
+
+      (if (= (- max-stages current-stage) 1 )
+	  (set! stage-start-time 12000)
+	  (set! stage-start-time 5000)) 
+      
       (set! current-stage  (+ 1 current-stage))
+      (when (> current-stage  max-stages)
+	(set! current-stage 1))
       (change-prop)
-      (set! stage-cleared? #f)))
-  (if (> score 5)
+      (set! stage-cleared? #f)
+      ))
+  (if (> score 100)
       (set! stage-cleared?  #t)))
 
 (define stage-cleared?  #f)
 (define current-stage  1)
+(define max-stages  3)
 
 (define (update-score)
   (let loop ((max active-props)
@@ -276,7 +286,6 @@
 				      (vec2 5.0 5.0))
 	    
 	    (when (> (vec2-y (particle-vel prop)) 0)
-	      (equal? (particle-active prop) 'to-right-hand)
 	      (set-vec2-y! (particle-vel prop) -5)
 	      (set-vec2-y! (particle-force prop) -280)
 	      (set-vec2-x! (particle-force prop) -25)
@@ -443,12 +452,14 @@
   (let* ((player (get-player *state*))
 	 (player-pos (particle-pos  (player-particle player))))
     
+    ;; TODO: add some placeholders with gradient.
     (set-fill-color! context "#140c1c")
     (fill-rect context 0.0 0.0 game-width game-height)
 
     ;; stage
-    (draw-rectangle "#333333" (vec2 0.0 0.0)
+    (draw-rectangle "#383838" (vec2 0.0 0.0)
 		    (vec2 640.0 150.0))
+
     ;; floor
     (draw-rectangle "#4a281b" (vec2 0.0 150.0)
 		    (vec2 640.0 10.0))
@@ -536,11 +547,7 @@
 	  (begin 
 	    (fill-text context "Prepare for the next challenge!!!"
 		       160.0 200.0))))
-
-
-
-
-   ;; first row 
+    ;; first row 
     (draw-sprite image:head3
 		 (vec2 20.0 340.0) 
 		 (vec2 64.0 64.0))
@@ -577,7 +584,7 @@
 
 
     
-   
+    
     (request-animation-frame draw-callback)))
 
 (define (draw-testing dt)
