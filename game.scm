@@ -419,13 +419,17 @@
 (define active-props 0)
 
 (define (draw-ui)
-  (if (< score 100)
+  (if (< score 60)
       (draw-rectangle   "#fafafa" (vec2 570.0
 					20.0)
 			(vec2 10.0   score))
-      (draw-rectangle "#f2a233"  (vec2 570.0
-				       20.0)
-		      (vec2 10.0   100.0)))
+      (if (< score 80) 
+	  (draw-rectangle "#eedd82"  (vec2 570.0
+					   20.0)
+			  (vec2 10.0   (clamp score score 100)))
+	  (draw-rectangle "#f4c233"  (vec2 570.0
+					   20.0)
+			  (vec2 10.0   (clamp score score 100)))))
   
   (let loop ((max active-props)
 	     (ui-y 20.0)
