@@ -383,6 +383,7 @@
 (define image:ring (make-image "assets/images/ring.png"))
 (define image:head (make-image "assets/images/head.png"))
 (define image:head2 (make-image "assets/images/head2.png"))
+(define image:head3 (make-image "assets/images/head3.png"))
 (define image:juggler-head (make-image "assets/images/juggler-head.png"))
 (define image:juggler-head-s (make-image "assets/images/juggler-head-s.png"))
 (define image:juggler-body (make-image "assets/images/juggler-body.png"))
@@ -457,6 +458,11 @@
     
     (draw-rectangle "#4a281b" (vec2 0.0 280.0)
 		    (vec2 640.0 10.0))
+
+
+    (draw-rectangle "#3a3a3a" (vec2 0.0 300.0)
+		    (vec2 680.0 50.0))
+
     
     ;; Draw falling props
     (let loop ((max active-props)
@@ -485,9 +491,15 @@
 		 player-pos 
 		 (vec2 64.0 130.0))
     
-    (draw-sprite image:juggler-head-s
-		 (vec2-add player-pos (vec2 8.0 0.0))
-		 (vec2 64.0 64.0))
+    (draw-rotated-sprite image:juggler-head-s
+			 (vec2-add player-pos (vec2 40.0 34.0))
+			 (vec2 64.0 64.0)
+			 (cond
+			  ((> (vec2-x (particle-vel (player-particle player))) 0.3)
+			   0.08)
+			  ((< (vec2-x (particle-vel (player-particle player))) -0.3)
+			   -0.08)
+			  (else 0)))
     
     (draw-props current-prop
 		(hand (player-r-arm player))
@@ -509,28 +521,63 @@
 			       (/ (particle-elapsed (hashtable-ref props i))
 				  190.0)))
 	(loop max (+ i 1))))
-    
-    (draw-sprite image:head
-		 (vec2 175.0 334.0) 
-		 (vec2 64.0 64.0))
-    
-    (draw-sprite image:head2
-		 (vec2 280.0 334.0) 
-		 (vec2 64.0 64.0))
+
+
+
     (draw-ui)
     
     (when stage-cleared?
       (set-font! context "bold 16px monospace")
       (set-fill-color! context "#fbfbfb")
-      (if (> current-stage 2) 
-	  (fill-text context "You win!!!"
-		     160.0 200.0)
+      (if (= current-stage max-stages)
 	  (begin 
-	    (fill-text context "Prepare for a new challenge!!!"
+	    (fill-text context "You win!! Thank you for playing."
+		       120.0 290.0))
+	  (begin 
+	    (fill-text context "Prepare for the next challenge!!!"
 		       160.0 200.0))))
+
+
+
+
+   ;; first row 
+    (draw-sprite image:head3
+		 (vec2 20.0 340.0) 
+		 (vec2 64.0 64.0))
     
+    (draw-sprite image:head
+		 (vec2 180.0 334.0) 
+		 (vec2 64.0 64.0))
+    
+    (draw-sprite image:head2
+		 (vec2 275.0 334.0) 
+		 (vec2 64.0 64.0))
+
+    (draw-sprite image:head3
+		 (vec2 360.0 334.0) 
+		 (vec2 64.0 64.0))
+
     (draw-chair-row (vec2 15.0 380) (vec2 70.0 60.0) game-width 15.0)
+
+    
+    ;; second row
+    (draw-sprite image:head2
+		 (vec2 85.0 380.0) 
+		 (vec2 64.0 64.0))
+    
+    (draw-sprite image:head
+		 (vec2 340.0 380.0) 
+		 (vec2 64.0 64.0))
+
+    (draw-sprite image:head2
+		 (vec2 420.0 380.0) 
+		 (vec2 64.0 64.0))
+    
     (draw-chair-row (vec2 0.0 420) (vec2 70.0 60.0) game-width 15.0)
+
+
+    
+   
     (request-animation-frame draw-callback)))
 
 (define (draw-testing dt)
