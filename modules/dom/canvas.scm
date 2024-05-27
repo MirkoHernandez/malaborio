@@ -43,7 +43,11 @@
 	    save
 	    rotate
 	    restore
-	    translate))
+	    translate
+	    create-linear-gradient
+	    add-color-stop
+	    set-fill-color-with-gradient!
+	    ))
 
 ;; HTMLCanvasElement
 (define-foreign get-context
@@ -127,3 +131,14 @@
   "canvas" "translate"
   (ref extern) f64 f64 -> none)
 
+(define-foreign create-linear-gradient
+  "canvas" "createLinearGradient"
+  (ref extern) f64 f64 f64 f64 -> (ref extern))
+
+(define-foreign add-color-stop
+  "element" "addColorStop"
+  (ref extern) f64 (ref string)  -> none)
+
+(define-foreign set-fill-color-with-gradient!
+  "canvas" "setFillColorWithGradient"
+  (ref extern) (ref extern) -> none)

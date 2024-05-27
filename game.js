@@ -19,6 +19,7 @@ window.addEventListener("load", async () => {
       },
       element: {
         value: (elem) => elem.value,
+        addColorStop: (elem,alpha, color) => elem.addColorStop(alpha,color),
         requestFullscreen: (elem) => elem.requestFullscreen(),
         setValue: (elem, value) => elem.value = value,
         width: (elem) => elem.width,
@@ -57,6 +58,7 @@ window.addEventListener("load", async () => {
       canvas: {
         getContext: (elem, type) => elem.getContext(type),
         setFillColor: (ctx, color) => ctx.fillStyle = color,
+        setFillColorWithGradient: (ctx, color) => ctx.fillStyle = color,
         beginPath: (ctx) => ctx.beginPath(),
         stroke: (ctx) => ctx.stroke(),
         strokeStyle: (ctx,color) => ctx.strokeStyle = color,
@@ -68,6 +70,7 @@ window.addEventListener("load", async () => {
         save: (ctx) => ctx.save(),
         rotate: (ctx,r) => ctx.rotate(r),
         translate: (ctx,x,y) => ctx.translate(x,y),
+        createLinearGradient: (ctx,x,y,x2,y2) => ctx.createLinearGradient(x,y,x2,y2),
         setFont: (ctx, font) => ctx.font = font,
         setTextAlign: (ctx, align) => ctx.textAlign = align,
         clearRect: (ctx, x, y, w, h) => ctx.clearRect(x, y, w, h),
