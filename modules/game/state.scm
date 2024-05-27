@@ -94,7 +94,7 @@
       ;; damping
       0.99
       ;; inverse-mass
-      120
+      90
       ;;active
       #t
       0
@@ -142,16 +142,16 @@
     (set-size-upper-arm l-arm 25.0)
     (set-size-forearm l-arm 30.0)
     
-    (set-shoulder l-arm (vec2 20.0 20.0))
-    (set-elbow l-arm (vec2 400.0 20.0))
-    (set-hand l-arm (vec2 400.0 20.0))
-
+    (set-shoulder l-arm (vec2 0.0 0.0))
+    (set-elbow l-arm (vec2 0.0 0.0))
+    (set-hand l-arm (vec2 0.0 0.0))
 
     (set-size-upper-arm r-arm 25.0)
     (set-size-forearm r-arm 30.0)
-    (set-shoulder r-arm (vec2 20.0 20.0))
-    (set-elbow r-arm (vec2 400.0 20.0))
-    (set-hand r-arm (vec2 400.0 20.0))
+    
+    (set-shoulder r-arm (vec2 0.0 0.0))
+    (set-elbow r-arm (vec2 0.0 0.0))
+    (set-hand r-arm (vec2 0.0 0.0))
     ))
 
 (define (init-state state)
